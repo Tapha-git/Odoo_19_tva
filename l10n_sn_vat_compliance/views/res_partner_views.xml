@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_sn_vat_compliance" model="ir.ui.view">
+        <field name="name">res.partner.form.sn.vat.compliance</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <field name="company_registry" position="after">
+                <field name="country_code" invisible="1"/>
+                <field name="sn_ninea"
+                       invisible="country_code != 'SN'"
+                       placeholder="NINEA du partenaire"/>
+            </field>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="paperformat_dgid_vat_declaration" model="report.paperformat">
+        <field name="name">Déclaration TVA Sénégal eTax - A4</field>
+        <field name="default" eval="False"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">5</field>
+        <field name="margin_bottom">5</field>
+        <field name="margin_left">7</field>
+        <field name="margin_right">7</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">0</field>
+        <field name="dpi">96</field>
+    </record>
+
+    <record id="action_report_dgid_vat_declaration" model="ir.actions.report">
+        <field name="name">Déclaration TVA Sénégal eTax</field>
+        <field name="model">l10n_sn.vat.audit.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">l10n_sn_vat_compliance.report_dgid_vat_declaration</field>
+        <field name="report_file">l10n_sn_vat_compliance.report_dgid_vat_declaration</field>
+        <field name="paperformat_id" ref="paperformat_dgid_vat_declaration"/>
+        <field name="print_report_name">'Declaration_TVA_Senegal_%s_%s' % (object.date_from, object.date_to)</field>
+    </record>
+
+    <template id="report_dgid_vat_declaration">
+        <t t-call="web.html_container">
+            <style>
+                .sn-vat-page { font-family: Arial, sans-serif; font-size: 9px; color: #111; }
+                .sn-head { width: 100%; border-collapse: collapse; }
+                .sn-head td { vertical-align: top; }
+                .sn-flag { width: 108px; height: 55px; display: inline-table; border-collapse: collapse; }
+                .sn-flag span { display: table-cell; width: 36px; }
+                .sn-green { background: #00853f; }
+                .sn-yellow { background: #fdef42; text-align: center; vertical-align: middle; font-size: 25px; color: #00853f; }
+                .sn-red { background: #e31b23; }
+                .sn-barcode { height: 34px; width: 142px; margin-left: auto;
+                    background: repeating-linear-gradient(90deg,#111 0,#111 1px,#fff 1px,#fff 3px,#111 3px,#111 5px,#fff 5px,#fff 7px); }
+                .sn-title { text-align: center; font-size: 20px; font-weight: 700; margin: 24px 0 6px; }
+                .sn-rule { border-top: 1.5px solid #111; }
+                .sn-section { font-size: 12px; font-weight: 700; margin: 10px 0; }
+                .sn-info { width: 100%; border-collapse: collapse; line-height: 1.55; font-size: 9px; }
+                .sn-info .label { font-weight: 700; width: 23%; }
+                .sn-info .value { width: 27%; }
+                .sn-gray { background: #eee; padding: 2px 5px; }
+                .sn-instruction { font-size: 8px; font-weight: 600; margin: 15px 0 7px; line-height: 1.35; }
+                .sn-lines { width: 100%; border-collapse: separate; border-spacing: 0 3px; font-size: 8.6px; }
+                .sn-lines th { text-align: left; padding-bottom: 2px; }
+                .sn-lines .desc { width: 44%; font-weight: 600; }
+                .sn-lines .schedule { width: 29%; }
+                .sn-lines .dots { border-bottom: 1px dotted #111; }
+                .sn-lines .line { width: 6%; text-align: right; font-weight: 700; }
+                .sn-lines .amount { width: 21%; text-align: center; border: 1.6px solid #111;
+                    font-family: "Times New Roman", serif; font-size: 14px; font-weight: 700; padding: 1px 3px; }
+                .sn-footer { width: 100%; margin-top: 7px; font-size: 7px; }
+                .sn-footer td:last-child { text-align: right; }
+                .sn-cut { border-top: 1.5px dashed #111; margin: 18px 0 12px; }
+                .sn-slip { width: 100%; border-collapse: collapse; font-size: 9px; line-height: 1.65; }
+                .sn-slip .label { font-weight: 700; }
+                .sn-sign-line { display: inline-block; min-width: 150px; border-bottom: 1px solid #111; height: 12px; }
+            </style>
+
+            <t t-foreach="docs" t-as="o">
+                <t t-set="v" t-value="o._get_dgid_form_values()"/>
+                <t t-set="company" t-value="o.company_id"/>
+                <t t-set="tin" t-value="company.partner_id.sn_ninea or company.vat or ''"/>
+
+                <div class="page sn-vat-page" style="page-break-after: always;">
+                    <table class="sn-head">
+                        <tr>
+                            <td style="width:34%;">
+                                <div class="sn-flag">
+                                    <span class="sn-green"></span><span class="sn-yellow">★</span><span class="sn-red"></span>
+                                </div>
+                                <div style="display:inline-block; vertical-align:top; margin-left:8px; font-size:7px; text-align:center;">
+                                    <strong>REPUBLIQUE DU SENEGAL</strong><br/>
+                                    Un Peuple - Un But - Une Foi<br/>
+                                    <strong>MINISTERE DE L'ECONOMIE,<br/>DES FINANCES ET DU PLAN</strong><br/>
+                                    <strong>DGID</strong>
+                                </div>
+                            </td>
+                            <td style="width:40%; text-align:center;">
+                                <div style="font-size:14px; font-weight:bold;">SÉNÉGAL</div>
+                                <div style="font-size:15px; font-weight:bold; margin-top:7px;">
+                                    DGID - Ministère de l'Économie, des<br/>Finances et du Plan
+                                </div>
+                            </td>
+                            <td style="width:26%; text-align:center;">
+                                <strong>DOCUMENT NO.</strong>
+                                <div class="sn-barcode" style="margin-top:10px;"></div>
+                                <div class="sn-gray" style="display:inline-block; min-width:100px;" t-esc="o.document_number or ''"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="sn-title">DECLARATION - TAXE SUR LA VALEUR AJOUTEE</div>
+                    <div class="sn-rule"></div>
+                    <div class="sn-section">TAXPAYER AND TAX INFORMATION</div>
+
+                    <table class="sn-info">
+                        <tr>
+                            <td class="label">TIN</td><td class="value"><span class="sn-gray" t-esc="tin"/></td>
+                            <td class="label">TAXPAYER NAME</td><td class="value"><span class="sn-gray" t-esc="company.name"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">TAX ACCOUNT</td><td class="value"><span class="sn-gray" t-esc="company.sn_tax_account or ''"/></td>
+                            <td class="label"></td><td class="value"></td>
+                        </tr>
+                        <tr>
+                            <td class="label">TAX PERIOD</td><td class="value"><span class="sn-gray" t-esc="v['period_label']"/></td>
+                            <td class="label">TAX TYPE</td><td class="value"><strong>TVA</strong></td>
+                        </tr>
+                        <tr>
+                            <td class="label">TAX DIVISION</td><td class="value"><strong t-esc="company.sn_tax_division or ''"/></td>
+                            <td class="label">COLLECTION LOCATION</td><td class="value"><strong t-esc="company.sn_collection_location or company.sn_tax_division or ''"/></td>
+                        </tr>
+                        <tr><td colspan="4" style="height:8px;"></td></tr>
+                        <tr>
+                            <td class="label">ESTABLISHMENT</td><td class="value"><span class="sn-gray" t-esc="company.sn_tax_establishment or ''"/></td>
+                            <td class="label">TAXABLE OBJECT</td><td class="value"><span class="sn-gray" t-esc="company.sn_taxable_object or ''"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">TAX PERIOD START DATE</td><td class="value"><span class="sn-gray" t-esc="v['date_from_label']"/></td>
+                            <td class="label">TAX PERIOD END DATE</td><td class="value"><span class="sn-gray" t-esc="v['date_to_label']"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">FILING DUE DATE</td><td class="value"><span class="sn-gray" t-esc="v['deadline_label']"/></td>
+                            <td class="label">PAYMENT DUE DATE</td><td class="value"><span class="sn-gray" t-esc="v['deadline_label']"/></td>
+                        </tr>
+                        <tr>
+                            <td class="label">SUBMISSION NO.</td><td class="value"><span class="sn-gray" t-esc="o.submission_number or ''"/></td>
+                            <td class="label">SUBMITTED DATE</td><td class="value"><span class="sn-gray" t-esc="o.submitted_date or ''"/></td>
+                        </tr>
+                        <tr>
+                            <td></td><td></td><td class="label">BANK ACCOUNT</td><td class="value"></td>
+                        </tr>
+                        <tr><td colspan="2"></td><td class="label" style="padding-top:8px;">LOCATION ADDRESS</td><td></td></tr>
+                        <tr>
+                            <td colspan="2"></td>
+                            <td colspan="2">
+                                <span t-esc="company.street or ''"/><br/>
+                                <span t-esc="' '.join(filter(None, [company.street2, company.city]))"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="sn-instruction">
+                        Veuillez indiquer ci-dessous les renseignements demandés conformément au Code Général des Impôts.
+                        Vous devez également joindre les annexes requises sous peine des sanctions prévues par la loi.
+                        Les chèques bancaires ou postaux doivent être libellés à l'ordre du Chef du Bureau du Recouvrement.
+                        Les chèques bancaires doivent être barrés.
+                    </div>
+
+                    <table class="sn-lines">
+                        <thead><tr><th class="desc"></th><th class="schedule">Tax Schedule</th><th class="line">Line</th><th style="text-align:right;">Amount</th></tr></thead>
+                        <tbody>
+                            <t t-foreach="[
+                                ('Montant total des opérations','',5,'line_5'),
+                                ('Affaires à l’exportation','EXPORTATIONS',10,'line_10'),
+                                ('Affaires réalisées à l’intérieur non taxées','EXONERATIONS',15,'line_15'),
+                                ('Affaires réalisées en suspension de la TVA','SUSPENSIONS',20,'line_20'),
+                                ('Total affaires non soumises à la TVA','',25,'line_25'),
+                                ('Prélèvements et livraisons ou prestations à soi-même','',30,'line_30'),
+                                ('Montant Total Taxable (L5-L25)','',35,'line_35'),
+                                ('Montant taxable-Taux réduit','',40,'line_40'),
+                                ('Montant taxable-Taux Normal (L35-L40)','',45,'line_45'),
+                                ('Montant de la TVA-Taux Réduit (L40*10%)','',50,'line_50'),
+                                ('Montant de la TVA-Taux Normal (L45*18%)','',55,'line_55'),
+                                ('Montant de la TVA Brut (L50+L55)','',60,'line_60'),
+                                ('Affaires soumises au précompte','',65,'line_65'),
+                                ('Précompte de TVA','TVA PRECOMPTEE',70,'line_70'),
+                                ('Imputation de chèques DDI','',75,'line_75'),
+                                ('Total des avances (L70+L75)','',76,'line_76'),
+                                ('Montant des importations du mois','',80,'line_80')
+                            ]" t-as="row">
+                                <tr>
+                                    <td class="desc" t-esc="row[0]"/>
+                                    <td class="schedule"><div class="dots" t-esc="row[1] or ''"/></td>
+                                    <td class="line" t-esc="row[2]"/>
+                                    <td class="amount" t-esc="'{:,.0f}'.format(v[row[3]]).replace(',', ' ')"/>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <table class="sn-footer"><tr><td>Printed on <span t-esc="o.submitted_date or ''"/></td><td>TIN <span t-esc="tin"/> &#160;&#160; Document No. <span t-esc="o.document_number or ''"/> &#160;&#160; Page 1 of 2</td></tr></table>
+                </div>
+
+                <div class="page sn-vat-page">
+                    <table class="sn-lines" style="margin-top:10px;">
+                        <tbody>
+                            <t t-foreach="[
+                                ('TVA Acquittée sur les importations du mois','IMPORTATIONS',85,'line_85'),
+                                ('TVA acquittées sur les achats intérieurs du mois','ACHATS LOCAUX',90,'line_90'),
+                                ('Déductions sur achats (L85+L90)','',91,'line_91'),
+                                ('Total déductions pour le mois (L76+L91)','',92,'line_92'),
+                                ('Solde total exigible pour la période','',93,'line_93')
+                            ]" t-as="row">
+                                <tr><td class="desc" t-esc="row[0]"/><td class="schedule"><div class="dots" t-esc="row[1] or ''"/></td><td class="line" t-esc="row[2]"/><td class="amount" t-esc="'{:,.0f}'.format(v[row[3]]).replace(',', ' ')"/></tr>
+                            </t>
+                            <tr><th class="desc"></th><th class="schedule">Tax Schedule</th><th class="line">Line</th><th style="text-align:right;">Amount</th></tr>
+                            <t t-foreach="[
+                                ('Montant des remboursements demandés et accordés','',95,'line_95'),
+                                ('Crédit du mois précédent (formulaire)','',96,'line_96'),
+                                ('Crédit de TVA du mois précédent','',100,'line_100'),
+                                ('Montant total déductible pour le mois (L70+L75+L85+L90+L100)','',105,'line_105'),
+                                ('Solde Total Exigible (L60-L105 si positif)','',110,'line_110'),
+                                ('Crédit de TVA à reporter (L105-L60 si positif)','',115,'line_115'),
+                                ('Montant des remboursements demandés et en instruction','',120,'line_120')
+                            ]" t-as="row">
+                                <tr><td class="desc" t-esc="row[0]"/><td class="schedule"><div class="dots"></div></td><td class="line" t-esc="row[2]"/><td class="amount" t-esc="'{:,.0f}'.format(v[row[3]]).replace(',', ' ')"/></tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="sn-cut"></div>
+
+                    <table class="sn-head">
+                        <tr>
+                            <td style="width:30%;">
+                                <div class="sn-flag" style="width:88px;height:44px;"><span class="sn-green"></span><span class="sn-yellow">★</span><span class="sn-red"></span></div>
+                                <div style="display:inline-block; vertical-align:top; margin-left:6px; font-size:6px; text-align:center;">
+                                    <strong>REPUBLIQUE DU SENEGAL</strong><br/>Un Peuple - Un But - Une Foi<br/>
+                                    <strong>MINISTERE DE L'ECONOMIE<br/>DES FINANCES ET DU PLAN</strong><br/><strong>DGID</strong>
+                                </div>
+                            </td>
+                            <td style="width:38%;"><div class="sn-gray" style="height:52px; width:160px;"></div></td>
+                            <td style="width:32%; text-align:center;"><strong>DOCUMENT NO.</strong><div class="sn-barcode" style="margin-top:7px;"></div><span class="sn-gray" t-esc="o.document_number or ''"/></td>
+                        </tr>
+                    </table>
+
+                    <table class="sn-slip" style="margin-top:12px;">
+                        <tr><td class="label">TAX PERIOD</td><td><span class="sn-gray" t-esc="v['period_label_lower']"/></td><td class="label">TAXPAYER NAME</td><td><span class="sn-gray" t-esc="company.name"/></td></tr>
+                        <tr><td class="label">TIN</td><td t-esc="tin"/><td class="label">TAX TYPE</td><td><strong>TVA</strong></td></tr>
+                        <tr><td class="label">TAX ACCOUNT</td><td t-esc="company.sn_tax_account or ''"/><td class="label">TAX DIVISION</td><td><strong t-esc="company.sn_tax_division or ''"/></td></tr>
+                        <tr><td class="label">TAX PERIOD START DATE</td><td><span class="sn-gray" t-esc="v['date_from_label']"/></td><td class="label">TAX PERIOD END DATE</td><td><span class="sn-gray" t-esc="v['date_to_label']"/></td></tr>
+                        <tr><td class="label">FILING DUE DATE</td><td><span class="sn-gray" t-esc="v['deadline_label']"/></td><td class="label">PAYMENT DUE DATE</td><td><span class="sn-gray" t-esc="v['deadline_label']"/></td></tr>
+                    </table>
+
+                    <table class="sn-slip" style="margin-top:20px;">
+                        <tr>
+                            <td class="label" style="width:12%;">AMOUNT PAID</td><td style="width:23%;"><span class="sn-sign-line"></span></td>
+                            <td class="label" style="width:20%;">CASHIER'S TAX DIVISION</td><td style="width:17%;"><span class="sn-sign-line" style="min-width:110px;"></span></td>
+                            <td class="label" style="width:12%;">ACCOUNT NO</td><td><span class="sn-sign-line"></span></td>
+                        </tr>
+                        <tr>
+                            <td class="label">DATE</td><td><span class="sn-sign-line"></span></td>
+                            <td class="label">AGENT SIGNATURE</td><td colspan="3"><span class="sn-sign-line" style="min-width:390px;"></span></td>
+                        </tr>
+                    </table>
+                    <table class="sn-footer" style="margin-top:170px;"><tr><td>Printed on <span t-esc="o.submitted_date or ''"/></td><td>TIN <span t-esc="tin"/> &#160;&#160; Document No. <span t-esc="o.document_number or ''"/> &#160;&#160; Page 2 of 2</td></tr></table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>
