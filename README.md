@@ -32,6 +32,10 @@ actualiser la liste des applications, puis installer :
 
 MMLY
 
+## Licence commerciale
+
+OPL-1. Prix de lancement prévu sur Odoo Apps : 99 EUR.
+
 ## Avertissement
 
 Le module assiste la préparation et le contrôle de la déclaration. La

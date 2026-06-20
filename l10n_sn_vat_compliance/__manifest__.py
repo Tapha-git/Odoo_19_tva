@@ -13,7 +13,11 @@ Le module complète l10n_sn et l10n_sn_reports avec :
 - un export CSV détaillé pour la revue de la déclaration.
     """,
     "author": "MMLY",
-    "license": "LGPL-3",
+    "website": "https://github.com/Tapha-git/Odoo_19_tva",
+    "support": "https://github.com/Tapha-git/Odoo_19_tva/issues",
+    "license": "OPL-1",
+    "price": 99.0,
+    "currency": "EUR",
     "depends": [
         "l10n_sn_reports",
     ],
