@@ -1,23 +1,27 @@
 {
-    "name": "Sénégal - Contrôle de conformité TVA",
+    "name": "Senegal VAT Compliance",
     "version": "19.0.1.0.0",
     "category": "Accounting/Localizations",
-    "summary": "Contrôle des pièces et piste d'audit pour la déclaration de TVA sénégalaise",
+    "summary": "Senegal VAT compliance, audit trail and DGID/eTax PDF declaration",
     "description": """
-Extension de la localisation comptable sénégalaise d'Odoo 19 Enterprise.
+Extension for the Senegal accounting localization in Odoo 19 Enterprise.
 
-Le module complète l10n_sn et l10n_sn_reports avec :
-- les informations NINEA des partenaires ;
-- le suivi des justificatifs de déduction sur les factures fournisseurs ;
-- un contrôle périodique de la TVA collectée et déductible ;
-- un export CSV détaillé pour la revue de la déclaration.
+The module extends l10n_sn and l10n_sn_reports with:
+- partner NINEA information;
+- deductible VAT supporting documents on vendor bills;
+- periodic controls of collected and deductible VAT;
+- detailed CSV audit exports;
+- the operational DGID/eTax VAT declaration in PDF.
     """,
     "author": "MMLY",
     "website": "https://github.com/Tapha-git/Odoo_19_tva",
-    "support": "https://github.com/Tapha-git/Odoo_19_tva/issues",
+    "support": "Tapha-git@users.noreply.github.com",
     "license": "OPL-1",
     "price": 99.0,
     "currency": "EUR",
+    "images": [
+        "static/description/banner.png",
+    ],
     "depends": [
         "l10n_sn_reports",
     ],
