@@ -290,6 +290,16 @@ class SenegalVatAuditWizard(models.TransientModel):
         def amount(code, label="tax"):
             return values_by_code.get(code, {}).get(label, 0.0)
 
+        report_has_values = any(
+            value
+            for expressions in values_by_code.values()
+            for value in expressions.values()
+        )
+        fallback = self._get_dgid_fallback_values() if not report_has_values else {}
+
+        def report_or_fallback(code, label, form_line):
+            return amount(code, label) if report_has_values else fallback.get(form_line, 0.0)
+
         prepayment = amount("SN_PREPAY")
         import_tax = amount("SN_IMPORT")
         domestic_tax = amount("SN_DOMESTIC")
@@ -317,41 +327,103 @@ class SenegalVatAuditWizard(models.TransientModel):
                 self.date_to + relativedelta(days=15),
                 date_format="dd MMMM yyyy",
             ),
-            "line_5": amount("SN_OPE", "base"),
-            "line_10": amount("SN_Export", "base"),
-            "line_15": amount("SN_NON_TAXED", "base"),
-            "line_20": amount("SN_SUSPENSION", "base"),
+            "line_5": report_or_fallback("SN_OPE", "base", "line_5"),
+            "line_10": report_or_fallback("SN_Export", "base", "line_10"),
+            "line_15": report_or_fallback("SN_NON_TAXED", "base", "line_15"),
+            "line_20": report_or_fallback("SN_SUSPENSION", "base", "line_20"),
             "line_25": (
                 amount("SN_Export", "base")
                 + amount("SN_NON_TAXED", "base")
                 + amount("SN_SUSPENSION", "base")
                 + amount("SN_EXEMPT", "base")
+            ) if report_has_values else fallback.get("line_25", 0.0),
+            "line_30": report_or_fallback("SN_SELF", "base", "line_30"),
+            "line_35": report_or_fallback("SN_TAXABLE", "base", "line_35"),
+            "line_40": report_or_fallback("SN_TAXABLE_10", "base", "line_40"),
+            "line_45": report_or_fallback("SN_TAXABLE_18", "base", "line_45"),
+            "line_50": report_or_fallback("SN_TAXABLE_10", "tax", "line_50"),
+            "line_55": report_or_fallback("SN_TAXABLE_18", "tax", "line_55"),
+            "line_60": gross_vat if report_has_values else fallback.get("line_60", 0.0),
+            "line_65": report_or_fallback("SN_WITHHOLDING", "base", "line_65"),
+            "line_70": report_or_fallback("SN_WITHHOLDING", "tax", "line_70"),
+            "line_75": report_or_fallback("SN_DDI", "tax", "line_75"),
+            "line_76": prepayment if report_has_values else fallback.get("line_76", 0.0),
+            "line_80": report_or_fallback("SN_IMPORT", "base", "line_80"),
+            "line_85": import_tax if report_has_values else fallback.get("line_85", 0.0),
+            "line_90": domestic_tax if report_has_values else fallback.get("line_90", 0.0),
+            "line_91": (
+                import_tax + domestic_tax
+                if report_has_values
+                else fallback.get("line_91", 0.0)
             ),
-            "line_30": amount("SN_SELF", "base"),
-            "line_35": amount("SN_TAXABLE", "base"),
-            "line_40": amount("SN_TAXABLE_10", "base"),
-            "line_45": amount("SN_TAXABLE_18", "base"),
-            "line_50": amount("SN_TAXABLE_10"),
-            "line_55": amount("SN_TAXABLE_18"),
-            "line_60": gross_vat,
-            "line_65": amount("SN_WITHHOLDING", "base"),
-            "line_70": amount("SN_WITHHOLDING"),
-            "line_75": amount("SN_DDI"),
-            "line_76": prepayment,
-            "line_80": amount("SN_IMPORT", "base"),
-            "line_85": import_tax,
-            "line_90": domestic_tax,
-            "line_91": import_tax + domestic_tax,
-            "line_92": current_deductions,
-            "line_93": max(gross_vat - current_deductions, 0.0),
-            "line_95": reimbursement,
+            "line_92": (
+                current_deductions
+                if report_has_values
+                else fallback.get("line_92", 0.0)
+            ),
+            "line_93": (
+                max(gross_vat - current_deductions, 0.0)
+                if report_has_values
+                else fallback.get("line_93", 0.0)
+            ),
+            "line_95": reimbursement if report_has_values else fallback.get("line_95", 0.0),
             "line_96": self.previous_form_credit,
-            "line_100": prior_credit,
-            "line_105": current_deductions + reimbursement + prior_credit,
-            "line_110": amount("SN_DUE"),
-            "line_115": amount("SN_REPORT"),
-            "line_120": amount("SN_REIMBURSEMENT_REVIEW"),
+            "line_100": prior_credit if report_has_values else fallback.get("line_100", 0.0),
+            "line_105": (
+                current_deductions + reimbursement + prior_credit
+                if report_has_values
+                else fallback.get("line_105", 0.0)
+            ),
+            "line_110": report_or_fallback("SN_DUE", "tax", "line_110"),
+            "line_115": report_or_fallback("SN_REPORT", "tax", "line_115"),
+            "line_120": report_or_fallback(
+                "SN_REIMBURSEMENT_REVIEW", "tax", "line_120"
+            ),
         }
+
+    def _get_dgid_fallback_values(self):
+        """Build DGID amounts from audited entries when fiscal tags are absent."""
+        self.ensure_one()
+        values = {"line_%s" % number: 0.0 for number in (
+            5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75,
+            76, 80, 85, 90, 91, 92, 93, 95, 100, 105, 110, 115, 120,
+        )}
+
+        for line in self.line_ids:
+            if line.operation_type == "sale":
+                values["line_5"] += line.base_amount
+                values["line_35"] += line.base_amount
+                if line.tax_rate == 10.0:
+                    values["line_40"] += line.base_amount
+                    values["line_50"] += line.tax_amount
+                elif line.tax_rate == 18.0:
+                    values["line_45"] += line.base_amount
+                    values["line_55"] += line.tax_amount
+                values["line_60"] += line.tax_amount
+                continue
+
+            if line.control_state != "compliant":
+                continue
+            move = line.move_id
+            if move.sn_vat_document_type == "import":
+                values["line_80"] += line.base_amount
+                values["line_85"] += line.tax_amount
+            elif move.sn_vat_document_type == "withholding":
+                values["line_65"] += line.base_amount
+                values["line_70"] += line.tax_amount
+            else:
+                values["line_90"] += line.tax_amount
+
+        values["line_76"] = values["line_70"] + values["line_75"]
+        values["line_91"] = values["line_85"] + values["line_90"]
+        values["line_92"] = values["line_76"] + values["line_91"]
+        values["line_93"] = max(values["line_60"] - values["line_92"], 0.0)
+        values["line_105"] = (
+            values["line_92"] + values["line_95"] + values["line_100"]
+        )
+        values["line_110"] = max(values["line_60"] - values["line_105"], 0.0)
+        values["line_115"] = max(values["line_105"] - values["line_60"], 0.0)
+        return values
 
     def action_print_dgid_vat_declaration(self):
         self.ensure_one()
