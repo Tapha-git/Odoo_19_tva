@@ -6,7 +6,7 @@
     "description": """
 Extension for the Senegal accounting localization in Odoo 18 Enterprise.
 
-The module extends l10n_sn and l10n_sn_reports with:
+The module extends the standard l10n_sn localization with:
 - partner NINEA information;
 - deductible VAT supporting documents on vendor bills;
 - periodic controls of collected and deductible VAT;
@@ -23,7 +23,7 @@ The module extends l10n_sn and l10n_sn_reports with:
         "static/description/banner.png",
     ],
     "depends": [
-        "l10n_sn_reports",
+        "l10n_sn",
     ],
     "data": [
         "security/ir.model.access.csv",
