@@ -2,8 +2,9 @@
 
 Développé et maintenu par **MMLY**.
 
-Ce module complète le module standard `l10n_sn`, qui contient directement le
-rapport de TVA sénégalais dans Odoo 18.
+Ce module complète le module standard `l10n_sn`, qui contient les lignes du
+rapport de TVA sénégalais dans Odoo 18, ainsi que le moteur Enterprise
+`account_reports`.
 Il ne remplace pas la déclaration TVA standard d'Odoo : il ajoute une piste
 d'audit documentaire avant validation et télédéclaration.
 
@@ -37,8 +38,8 @@ addons_path = C:\...\odoo\addons,C:\...\custom_addons
 
 1. Utiliser la branche Git `18.0` dans un staging Odoo.sh basé sur Odoo 18
    Enterprise.
-2. Vérifier que l'application **Sénégal - Comptabilité** (`l10n_sn`) est
-   disponible.
+2. Vérifier que **Sénégal - Comptabilité** (`l10n_sn`) et le moteur Enterprise
+   **Accounting Reports** (`account_reports`) sont disponibles.
 3. Dans le mode développeur, actualiser la liste des applications.
 4. Rechercher puis installer **Senegal VAT Compliance**.
 5. Tester le contrôle TVA et l'impression PDF avec une copie de la base avant

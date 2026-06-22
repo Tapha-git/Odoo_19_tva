@@ -92,7 +92,7 @@
 
     <menuitem id="menu_l10n_sn_vat_audit"
               name="Contrôle TVA Sénégal"
-              parent="account.account_reports_taxes_and_fiscal_menu"
+              parent="account.account_reports_legal_statements_menu"
               action="action_l10n_sn_vat_audit_wizard"
               sequence="15"
               groups="account.group_account_user"/>
