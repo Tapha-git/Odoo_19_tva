@@ -390,14 +390,19 @@ class SenegalVatAuditWizard(models.TransientModel):
         )}
 
         for line in self.line_ids:
+            taxable_base = (
+                line.tax_amount * 100.0 / line.tax_rate
+                if line.tax_rate
+                else line.base_amount
+            )
             if line.operation_type == "sale":
-                values["line_5"] += line.base_amount
-                values["line_35"] += line.base_amount
+                values["line_5"] += taxable_base
+                values["line_35"] += taxable_base
                 if line.tax_rate == 10.0:
-                    values["line_40"] += line.base_amount
+                    values["line_40"] += taxable_base
                     values["line_50"] += line.tax_amount
                 elif line.tax_rate == 18.0:
-                    values["line_45"] += line.base_amount
+                    values["line_45"] += taxable_base
                     values["line_55"] += line.tax_amount
                 values["line_60"] += line.tax_amount
                 continue
@@ -406,10 +411,10 @@ class SenegalVatAuditWizard(models.TransientModel):
                 continue
             move = line.move_id
             if move.sn_vat_document_type == "import":
-                values["line_80"] += line.base_amount
+                values["line_80"] += taxable_base
                 values["line_85"] += line.tax_amount
             elif move.sn_vat_document_type == "withholding":
-                values["line_65"] += line.base_amount
+                values["line_65"] += taxable_base
                 values["line_70"] += line.tax_amount
             else:
                 values["line_90"] += line.tax_amount
