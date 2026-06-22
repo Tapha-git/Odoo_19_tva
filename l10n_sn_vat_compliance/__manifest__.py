@@ -1,10 +1,10 @@
 {
     "name": "Senegal VAT Compliance",
-    "version": "19.0.1.0.0",
+    "version": "18.0.1.0.0",
     "category": "Accounting/Localizations",
     "summary": "Senegal VAT compliance, audit trail and DGID/eTax PDF declaration",
     "description": """
-Extension for the Senegal accounting localization in Odoo 19 Enterprise.
+Extension for the Senegal accounting localization in Odoo 18 Enterprise.
 
 The module extends l10n_sn and l10n_sn_reports with:
 - partner NINEA information;

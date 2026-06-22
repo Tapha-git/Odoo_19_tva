@@ -1,4 +1,4 @@
-# Contrôle de conformité TVA Sénégal — Odoo 19
+# Contrôle de conformité TVA Sénégal — Odoo 18
 
 Développé et maintenu par **MMLY**.
 
@@ -32,10 +32,21 @@ Exemple de chemin :
 addons_path = C:\...\odoo\addons,C:\...\custom_addons
 ```
 
+## Test sur Odoo.sh
+
+1. Utiliser la branche Git `18.0` dans un staging Odoo.sh basé sur Odoo 18
+   Enterprise.
+2. Vérifier que les applications **Sénégal - Comptabilité** (`l10n_sn`) et
+   **Sénégal - Rapports comptables** (`l10n_sn_reports`) sont disponibles.
+3. Dans le mode développeur, actualiser la liste des applications.
+4. Rechercher puis installer **Senegal VAT Compliance**.
+5. Tester le contrôle TVA et l'impression PDF avec une copie de la base avant
+   toute utilisation fiscale réelle.
+
 ## Important
 
 Le taux et les lignes de déclaration sont ceux de la localisation officielle
-Odoo 19 installée. La qualification juridique d'une opération, d'une
+Odoo 18 Enterprise installée. La qualification juridique d'une opération, d'une
 exonération ou d'un droit à déduction doit être validée par le responsable
 fiscal ou le conseil de l'entreprise avant dépôt auprès de la DGID.
 
