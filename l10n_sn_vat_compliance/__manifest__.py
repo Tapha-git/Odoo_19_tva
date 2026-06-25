@@ -18,8 +18,8 @@ accounting reports with:
     "website": "https://github.com/Tapha-git/Odoo_19_tva",
     "support": "Tapha-git@users.noreply.github.com",
     "license": "OPL-1",
-    "price": 99.0,
-    "currency": "EUR",
+    "price": 30.0,
+    "currency": "USD",
     "images": [
         "static/description/banner.png",
     ],
